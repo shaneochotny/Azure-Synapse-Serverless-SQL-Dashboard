@@ -15,9 +15,9 @@ This workbook requires the Synapse Analytics Workspace Diagnostic Settings be en
 
 ![alt tag](https://raw.githubusercontent.com/shaneochotny/Azure-Synapse-Serverless-SQL-Dashboard\/main/images/Synapse-Diagnostics-Step-1.png)
 
-2. Specifiy the diagnostic setting name, such as "<b>Diagnostics</b>". Next, select <b>BuiltinSqlReqsEnded</b> but enabling the other categories is fine too. Finally, check <b>Send to Log Analytics workspace</b> and specify the <b>Subscription</b> and <b>Log Analytics workspace</b> you want Synapse to log to.
+2. Specifiy the diagnostic setting name, such as "<b>Diagnostics</b>". Next, select <b>BuiltinSqlReqsEnded</b>. But enabling the other categories is fine too. Finally, check <b>Send to Log Analytics workspace</b> and specify the <b>Subscription</b> and <b>Log Analytics workspace</b> you want Synapse to log to.
 
-![alt tag](https://raw.githubusercontent.com/shaneochotny/Azure-Synapse-Serverless-SQL-Dashboard\/main/images/Synapse-Diagnostics-Step-1.png)
+![alt tag](https://raw.githubusercontent.com/shaneochotny/Azure-Synapse-Serverless-SQL-Dashboard\/main/images/Synapse-Diagnostics-Step-2.png)
 
 
 ### Create the Workbook
