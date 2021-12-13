@@ -1,0 +1,679 @@
+{
+    "version": "Notebook/1.0",
+    "items": [
+      {
+        "type": 1,
+        "content": {
+          "json": "\n## Synapse Serverless SQL Dashboard\n\nThis workbook helps provide a summary of Synapse Serverless SQL utilization. It provides an easy view to costs associated with user query activity."
+        },
+        "name": "text - 2"
+      },
+      {
+        "type": 9,
+        "content": {
+          "version": "KqlParameterItem/1.0",
+          "crossComponentResources": [
+            "{logAnalyticsWorkspace}"
+          ],
+          "parameters": [
+            {
+              "id": "09299b44-3668-44c9-96c9-47ba347b6e44",
+              "version": "KqlParameterItem/1.0",
+              "name": "timeRange",
+              "label": "Time Range",
+              "type": 4,
+              "isRequired": true,
+              "typeSettings": {
+                "selectableValues": [
+                  {
+                    "durationMs": 300000
+                  },
+                  {
+                    "durationMs": 900000
+                  },
+                  {
+                    "durationMs": 1800000
+                  },
+                  {
+                    "durationMs": 3600000
+                  },
+                  {
+                    "durationMs": 14400000
+                  },
+                  {
+                    "durationMs": 43200000
+                  },
+                  {
+                    "durationMs": 86400000
+                  },
+                  {
+                    "durationMs": 172800000
+                  },
+                  {
+                    "durationMs": 259200000
+                  },
+                  {
+                    "durationMs": 604800000
+                  },
+                  {
+                    "durationMs": 1209600000
+                  },
+                  {
+                    "durationMs": 2419200000
+                  },
+                  {
+                    "durationMs": 2592000000
+                  },
+                  {
+                    "durationMs": 5184000000
+                  },
+                  {
+                    "durationMs": 7776000000
+                  }
+                ]
+              },
+              "timeContext": {
+                "durationMs": 86400000
+              },
+              "value": {
+                "durationMs": 2592000000
+              }
+            },
+            {
+              "id": "772df4b9-51ee-45bc-8f1f-06a16314de44",
+              "version": "KqlParameterItem/1.0",
+              "name": "Subscription",
+              "type": 6,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "value": [
+                "value::all"
+              ],
+              "typeSettings": {
+                "additionalResourceOptions": [
+                  "value::all"
+                ],
+                "includeAll": true,
+                "showDefault": false
+              },
+              "defaultValue": "value::all"
+            },
+            {
+              "id": "b9596b80-dd09-4c9a-8129-5c00aeccb8e3",
+              "version": "KqlParameterItem/1.0",
+              "name": "logAnalyticsWorkspace",
+              "type": 5,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "query": "Resources\r\n| where type == 'microsoft.operationalinsights/workspaces'\r\n| project id",
+              "crossComponentResources": [
+                "{Subscription}"
+              ],
+              "value": [
+                "value::all"
+              ],
+              "typeSettings": {
+                "additionalResourceOptions": [
+                  "value::all"
+                ],
+                "showDefault": false
+              },
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "timeRange",
+              "defaultValue": "value::all",
+              "queryType": 1,
+              "resourceType": "microsoft.resourcegraph/resources"
+            },
+            {
+              "id": "c982c3aa-8076-400c-9834-8266fef07add",
+              "version": "KqlParameterItem/1.0",
+              "name": "serverlessSQLInstance",
+              "label": "Serverless SQL Instances",
+              "type": 2,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "query": "SynapseBuiltinSqlPoolRequestsEnded\r\n| distinct _ResourceId\r\n| project extract(\"[^/]+$\", 0, _ResourceId)",
+              "crossComponentResources": [
+                "{logAnalyticsWorkspace}"
+              ],
+              "typeSettings": {
+                "additionalResourceOptions": [
+                  "value::all"
+                ],
+                "showDefault": false
+              },
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "timeRange",
+              "defaultValue": "value::all",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces",
+              "value": [
+                "value::all"
+              ]
+            },
+            {
+              "id": "bb6893a5-6a29-479a-9b48-dea61e47d63e",
+              "version": "KqlParameterItem/1.0",
+              "name": "userName",
+              "label": "User",
+              "type": 2,
+              "multiSelect": true,
+              "quote": "'",
+              "delimiter": ",",
+              "query": "SynapseBuiltinSqlPoolRequestsEnded \r\n| parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n| where serverlessSQL in ({serverlessSQLInstance})\r\n| distinct \r\n    tostring(Identity)\r\n| project\r\n    tostring(Identity)\r\n| sort by\r\n    tostring(Identity)",
+              "crossComponentResources": [
+                "{logAnalyticsWorkspace}"
+              ],
+              "typeSettings": {
+                "additionalResourceOptions": [
+                  "value::all"
+                ],
+                "showDefault": false
+              },
+              "timeContext": {
+                "durationMs": 0
+              },
+              "timeContextFromParameter": "timeRange",
+              "defaultValue": "value::all",
+              "queryType": 0,
+              "resourceType": "microsoft.operationalinsights/workspaces"
+            }
+          ],
+          "style": "pills",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces"
+        },
+        "name": "parameters - 5"
+      },
+      {
+        "type": 12,
+        "content": {
+          "version": "NotebookGroup/1.0",
+          "groupType": "editable",
+          "items": [
+            {
+              "type": 1,
+              "content": {
+                "json": "---\r\n\r\n# Usage Details"
+              },
+              "name": "text - 2"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "let totalData = view () {\r\n    SynapseBuiltinSqlPoolRequestsEnded \r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | summarize \r\n        EstimatedCost=strcat(\"$\", round(todecimal(trim_end(\" MB\", format_bytes(sum(todecimal(Properties.dataProcessedBytes)), 0, \"MB\"))) * 0.000005, 2))\r\n    | project\r\n        id = 1,\r\n        Name = \"Total Estimated Cost\",\r\n        EstimatedCost\r\n};\r\n\r\nSynapseBuiltinSqlPoolRequestsEnded\r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | make-series Trend = round(todecimal(trim_end(\" MB\", format_bytes(sum(todecimal(Properties.dataProcessedBytes)), 0, \"MB\"))) * 0.000005, 2) default = 0 on TimeGenerated from {timeRange:start} to {timeRange:end} step {timeRange:grain}\r\n    | project-away TimeGenerated\r\n| project\r\n    id = 1,\r\n    Trend\r\n| join (totalData) on id",
+                "size": 3,
+                "timeContext": {
+                  "durationMs": 2592000000
+                },
+                "timeContextFromParameter": "timeRange",
+                "queryType": 0,
+                "resourceType": "microsoft.operationalinsights/workspaces",
+                "crossComponentResources": [
+                  "{logAnalyticsWorkspace}"
+                ],
+                "visualization": "tiles",
+                "tileSettings": {
+                  "titleContent": {
+                    "columnMatch": "Name",
+                    "formatter": 1
+                  },
+                  "leftContent": {
+                    "columnMatch": "EstimatedCost",
+                    "formatter": 12,
+                    "formatOptions": {
+                      "palette": "blue"
+                    }
+                  },
+                  "secondaryContent": {
+                    "columnMatch": "Trend",
+                    "formatter": 10,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue"
+                    }
+                  },
+                  "showBorder": false
+                }
+              },
+              "customWidth": "16",
+              "name": "Total Estimated Cost"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "let totalData = view () {\r\n    SynapseBuiltinSqlPoolRequestsEnded \r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | summarize \r\n        DataProcessed=format_bytes(sum(todecimal(Properties.dataProcessedBytes)), 2)\r\n    | project\r\n        id = 1,\r\n        Name = \"Total Data Processed\",\r\n        DataProcessed\r\n};\r\n\r\nSynapseBuiltinSqlPoolRequestsEnded\r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | make-series Trend = todecimal(trim_end(\" MB\", format_bytes(sum(todecimal(Properties.dataProcessedBytes)), 0, \"MB\"))) default = 0 on TimeGenerated from {timeRange:start} to {timeRange:end} step {timeRange:grain}\r\n    | project-away TimeGenerated\r\n| project\r\n    id = 1,\r\n    Trend\r\n| join (totalData) on id",
+                "size": 3,
+                "timeContext": {
+                  "durationMs": 2592000000
+                },
+                "timeContextFromParameter": "timeRange",
+                "queryType": 0,
+                "resourceType": "microsoft.operationalinsights/workspaces",
+                "crossComponentResources": [
+                  "{logAnalyticsWorkspace}"
+                ],
+                "visualization": "tiles",
+                "tileSettings": {
+                  "titleContent": {
+                    "columnMatch": "Name",
+                    "formatter": 1
+                  },
+                  "leftContent": {
+                    "columnMatch": "DataProcessed",
+                    "formatter": 12,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue"
+                    }
+                  },
+                  "secondaryContent": {
+                    "columnMatch": "Trend",
+                    "formatter": 10,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue"
+                    }
+                  },
+                  "showBorder": false
+                }
+              },
+              "customWidth": "16",
+              "name": "Total Data Processed"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "let totalData = view () {\r\n    SynapseBuiltinSqlPoolRequestsEnded \r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | project-rename User=Identity\r\n    | extend User = tostring(User)\r\n    | summarize \r\n        TotalUsers=dcount(User)\r\n    | project\r\n        id = 1,\r\n        Name = \"Total Users\",\r\n        TotalUsers\r\n};\r\n\r\nSynapseBuiltinSqlPoolRequestsEnded\r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | make-series Trend = dcount(tostring(Identity)) default = 0 on TimeGenerated from {timeRange:start} to {timeRange:end} step {timeRange:grain}\r\n    | project\r\n        id = 1,\r\n        Trend\r\n| join (totalData) on id",
+                "size": 3,
+                "timeContext": {
+                  "durationMs": 2592000000
+                },
+                "timeContextFromParameter": "timeRange",
+                "queryType": 0,
+                "resourceType": "microsoft.operationalinsights/workspaces",
+                "crossComponentResources": [
+                  "{logAnalyticsWorkspace}"
+                ],
+                "visualization": "tiles",
+                "tileSettings": {
+                  "titleContent": {
+                    "columnMatch": "Name",
+                    "formatter": 1
+                  },
+                  "leftContent": {
+                    "columnMatch": "TotalUsers",
+                    "formatter": 12,
+                    "formatOptions": {
+                      "palette": "none"
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Total users during the time range"
+                    }
+                  },
+                  "secondaryContent": {
+                    "columnMatch": "Trend",
+                    "formatter": 10,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue"
+                    },
+                    "tooltipFormat": {
+                      "tooltip": "Total users per day"
+                    }
+                  },
+                  "showBorder": false
+                }
+              },
+              "customWidth": "16",
+              "name": "Total Users"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "let totalData = view () {\r\n    SynapseBuiltinSqlPoolRequestsEnded \r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | summarize \r\n        TotalQueries=count()\r\n    | project\r\n        id = 1,\r\n        Name = \"Total Queries\",\r\n        TotalQueries\r\n};\r\n\r\nSynapseBuiltinSqlPoolRequestsEnded\r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | make-series Trend = count() default = 0 on TimeGenerated from {timeRange:start} to {timeRange:end} step {timeRange:grain}\r\n    | project\r\n        id = 1,\r\n        Trend\r\n    | join (totalData) on id",
+                "size": 3,
+                "timeContext": {
+                  "durationMs": 2592000000
+                },
+                "timeContextFromParameter": "timeRange",
+                "queryType": 0,
+                "resourceType": "microsoft.operationalinsights/workspaces",
+                "crossComponentResources": [
+                  "{logAnalyticsWorkspace}"
+                ],
+                "visualization": "tiles",
+                "tileSettings": {
+                  "titleContent": {
+                    "columnMatch": "Name",
+                    "formatter": 1
+                  },
+                  "leftContent": {
+                    "columnMatch": "TotalQueries",
+                    "formatter": 12,
+                    "formatOptions": {
+                      "palette": "none"
+                    }
+                  },
+                  "secondaryContent": {
+                    "columnMatch": "Trend",
+                    "formatter": 10,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue"
+                    }
+                  },
+                  "showBorder": false
+                }
+              },
+              "customWidth": "16",
+              "name": "Total Queries"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "let totalData = view () {\r\n    SynapseBuiltinSqlPoolRequestsEnded \r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | where ResultType == \"Succeeded\"\r\n    | summarize \r\n        TotalQueries=count()\r\n    | project\r\n        id = 1,\r\n        Name = \"Total Successful Queries\",\r\n        TotalQueries\r\n};\r\n\r\nSynapseBuiltinSqlPoolRequestsEnded\r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | where ResultType == \"Succeeded\"\r\n    | make-series Trend = count() default = 0 on TimeGenerated from {timeRange:start} to {timeRange:end} step {timeRange:grain}\r\n    | project\r\n        id = 1,\r\n        Trend\r\n    | join (totalData) on id",
+                "size": 3,
+                "timeContext": {
+                  "durationMs": 2592000000
+                },
+                "timeContextFromParameter": "timeRange",
+                "queryType": 0,
+                "resourceType": "microsoft.operationalinsights/workspaces",
+                "crossComponentResources": [
+                  "{logAnalyticsWorkspace}"
+                ],
+                "visualization": "tiles",
+                "tileSettings": {
+                  "titleContent": {
+                    "columnMatch": "Name",
+                    "formatter": 1
+                  },
+                  "leftContent": {
+                    "columnMatch": "TotalQueries",
+                    "formatter": 12,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "green"
+                    }
+                  },
+                  "secondaryContent": {
+                    "columnMatch": "Trend",
+                    "formatter": 10,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue"
+                    }
+                  },
+                  "showBorder": false
+                }
+              },
+              "customWidth": "16",
+              "name": "Total Successful Queries"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "let totalData = view () {\r\n    SynapseBuiltinSqlPoolRequestsEnded \r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | where ResultType == \"Failed\"\r\n    | summarize \r\n        TotalQueries=count()\r\n    | project\r\n        id = 1,\r\n        Name = \"Total Failed Queries\",\r\n        TotalQueries\r\n};\r\n\r\nSynapseBuiltinSqlPoolRequestsEnded\r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | where ResultType == \"Failed\"\r\n    | make-series Trend = count() default = 0 on TimeGenerated from {timeRange:start} to {timeRange:end} step {timeRange:grain}\r\n    | project\r\n        id = 1,\r\n        Trend\r\n    | join (totalData) on id",
+                "size": 3,
+                "timeContext": {
+                  "durationMs": 2592000000
+                },
+                "timeContextFromParameter": "timeRange",
+                "queryType": 0,
+                "resourceType": "microsoft.operationalinsights/workspaces",
+                "crossComponentResources": [
+                  "{logAnalyticsWorkspace}"
+                ],
+                "visualization": "tiles",
+                "tileSettings": {
+                  "titleContent": {
+                    "columnMatch": "Name",
+                    "formatter": 1
+                  },
+                  "leftContent": {
+                    "columnMatch": "TotalQueries",
+                    "formatter": 12,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "red"
+                    }
+                  },
+                  "secondaryContent": {
+                    "columnMatch": "Trend",
+                    "formatter": 10,
+                    "formatOptions": {
+                      "min": 0,
+                      "palette": "blue"
+                    }
+                  },
+                  "showBorder": false
+                }
+              },
+              "customWidth": "16",
+              "name": "Total Failed Queries"
+            }
+          ]
+        },
+        "name": "Usage Details"
+      },
+      {
+        "type": 12,
+        "content": {
+          "version": "NotebookGroup/1.0",
+          "groupType": "editable",
+          "items": [
+            {
+              "type": 1,
+              "content": {
+                "json": "---\r\n\r\n# Queries by Day\r\n\r\nTotal successful and failed queries per day for all users."
+              },
+              "customWidth": "50",
+              "name": "text - 8"
+            },
+            {
+              "type": 1,
+              "content": {
+                "json": "---\r\n\r\n# User Query Activity\r\n\r\nQuery activity by user for the selected timeframe. Cost is an estimation based on $5 per TB of read data in 10MB increments."
+              },
+              "customWidth": "50",
+              "name": "text - 9"
+            },
+            {
+              "type": 12,
+              "content": {
+                "version": "NotebookGroup/1.0",
+                "groupType": "editable",
+                "items": [
+                  {
+                    "type": 3,
+                    "content": {
+                      "version": "KqlItem/1.0",
+                      "query": "SynapseBuiltinSqlPoolRequestsEnded \r\n| parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n| where serverlessSQL in ({serverlessSQLInstance})\r\n| where Identity in ({userName})\r\n| summarize Queries = count() by bin(TimeGenerated, 1d), ResultType\r\n| sort by TimeGenerated asc\r\n| render columnchart",
+                      "size": 0,
+                      "timeContext": {
+                        "durationMs": 2592000000
+                      },
+                      "timeContextFromParameter": "timeRange",
+                      "queryType": 0,
+                      "resourceType": "microsoft.operationalinsights/workspaces",
+                      "crossComponentResources": [
+                        "{logAnalyticsWorkspace}"
+                      ]
+                    },
+                    "customWidth": "50",
+                    "name": "Queries by Day"
+                  },
+                  {
+                    "type": 3,
+                    "content": {
+                      "version": "KqlItem/1.0",
+                      "query": "let AdhocQueries = \r\n    SynapseBuiltinSqlPoolRequestsEnded\r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | where Properties.queryText has \"OPENROWSET\"\r\n    | summarize \r\n        Name=\"Ad-hoc Queries\",\r\n        TotalQueries=count();\r\n\r\nlet ExternalTableQueries =\r\n    SynapseBuiltinSqlPoolRequestsEnded\r\n    | parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n    | where serverlessSQL in ({serverlessSQLInstance})\r\n    | where Identity in ({userName})\r\n    | where Properties.queryText !has \"OPENROWSET\"\r\n    | summarize \r\n        Name=\"Lake Database Queries\",\r\n        TotalQueries=count();\r\n\r\nunion AdhocQueries, ExternalTableQueries",
+                      "size": 4,
+                      "timeContext": {
+                        "durationMs": 2592000000
+                      },
+                      "timeContextFromParameter": "timeRange",
+                      "queryType": 0,
+                      "resourceType": "microsoft.operationalinsights/workspaces",
+                      "crossComponentResources": [
+                        "{logAnalyticsWorkspace}"
+                      ],
+                      "visualization": "piechart",
+                      "graphSettings": {
+                        "type": 0,
+                        "topContent": {
+                          "columnMatch": "Name",
+                          "formatter": 1
+                        },
+                        "centerContent": {
+                          "columnMatch": "TotalQueries",
+                          "formatter": 1,
+                          "numberFormat": {
+                            "unit": 17,
+                            "options": {
+                              "maximumSignificantDigits": 3,
+                              "maximumFractionDigits": 2
+                            }
+                          }
+                        }
+                      },
+                      "chartSettings": {
+                        "showMetrics": false,
+                        "showLegend": true
+                      }
+                    },
+                    "customWidth": "50",
+                    "name": "Query Type"
+                  }
+                ]
+              },
+              "customWidth": "50",
+              "name": "group - 5"
+            },
+            {
+              "type": 3,
+              "content": {
+                "version": "KqlItem/1.0",
+                "query": "SynapseBuiltinSqlPoolRequestsEnded \r\n| parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n| where serverlessSQL in ({serverlessSQLInstance})\r\n| where Identity in ({userName})\r\n| project-rename\r\n    User=Identity\r\n| summarize\r\n    DataProcessed=format_bytes(sum(todecimal(Properties.dataProcessedBytes)), 2), \r\n    TotalQueries=count(), \r\n    EstimatedCost=strcat(\"$\", round(todecimal(trim_end(\" MB\", format_bytes(sum(todecimal(Properties.dataProcessedBytes)), 0, \"MB\"))) * 0.000005, 2)) by tostring(User)\r\n| sort by\r\n    User",
+                "size": 0,
+                "timeContext": {
+                  "durationMs": 2592000000
+                },
+                "timeContextFromParameter": "timeRange",
+                "queryType": 0,
+                "resourceType": "microsoft.operationalinsights/workspaces",
+                "crossComponentResources": [
+                  "{logAnalyticsWorkspace}"
+                ],
+                "gridSettings": {
+                  "labelSettings": [
+                    {
+                      "columnId": "DataProcessed",
+                      "label": "Data Processed"
+                    },
+                    {
+                      "columnId": "TotalQueries",
+                      "label": "Total Queries"
+                    },
+                    {
+                      "columnId": "EstimatedCost",
+                      "label": "Estimated Cost"
+                    }
+                  ]
+                }
+              },
+              "customWidth": "50",
+              "name": "User Query Statistics"
+            }
+          ]
+        },
+        "name": "group - 9"
+      },
+      {
+        "type": 1,
+        "content": {
+          "json": "---\r\n\r\n# Query History"
+        },
+        "name": "text - 7"
+      },
+      {
+        "type": 3,
+        "content": {
+          "version": "KqlItem/1.0",
+          "query": "SynapseBuiltinSqlPoolRequestsEnded \r\n| parse kind=relaxed _ResourceId with * \"microsoft.synapse/workspaces/\" serverlessSQL\r\n| where serverlessSQL in ({serverlessSQLInstance})\r\n| where Identity in ({userName})\r\n| extend Duration = strcat(datetime_diff('second', todatetime(Properties.endTime), todatetime(Properties.startTime)), \"s\")\r\n| extend DataProcessed = format_bytes(tolong(Properties.dataProcessedBytes))\r\n| extend QueryType = iif(Properties.queryText has \"OPENROWSET\", \"Ad-hoc\", \"Lake Database\")\r\n| extend EstimatedCost = strcat(\"$\", round(todecimal(trim_end(\" MB\", format_bytes(todecimal(Properties.dataProcessedBytes), 0, \"MB\"))) * 0.000005, 2))\r\n| extend Query = Properties.queryText\r\n| project-rename Time = TimeGenerated\r\n| project-rename User = Identity\r\n| project-rename Result = ResultType\r\n| project\r\n    Time,\r\n    Duration,\r\n    DataProcessed,\r\n    EstimatedCost,\r\n    User,\r\n    QueryType,\r\n    Result,\r\n    ErrorCode,\r\n    Query\r\n| sort by Time",
+          "size": 0,
+          "timeContext": {
+            "durationMs": 2592000000
+          },
+          "timeContextFromParameter": "timeRange",
+          "queryType": 0,
+          "resourceType": "microsoft.operationalinsights/workspaces",
+          "crossComponentResources": [
+            "{logAnalyticsWorkspace}"
+          ],
+          "gridSettings": {
+            "formatters": [
+              {
+                "columnMatch": "QueryType",
+                "formatter": 1
+              },
+              {
+                "columnMatch": "Query",
+                "formatter": 7,
+                "formatOptions": {
+                  "linkTarget": "GenericDetails",
+                  "linkIsContextBlade": true
+                }
+              }
+            ],
+            "sortBy": [
+              {
+                "itemKey": "Time",
+                "sortOrder": 2
+              }
+            ],
+            "labelSettings": [
+              {
+                "columnId": "DataProcessed",
+                "label": "Data Processed"
+              },
+              {
+                "columnId": "EstimatedCost",
+                "label": "Estimated Cost"
+              },
+              {
+                "columnId": "QueryType",
+                "label": "Query Type"
+              },
+              {
+                "columnId": "ErrorCode",
+                "label": "Error Code"
+              }
+            ]
+          },
+          "sortBy": [
+            {
+              "itemKey": "Time",
+              "sortOrder": 2
+            }
+          ]
+        },
+        "name": "Query History"
+      }
+    ],
+    "$schema": "https://github.com/Microsoft/Application-Insights-Workbooks/blob/master/schema/workbook.json"
+  }
